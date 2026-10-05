@@ -5,9 +5,10 @@ spec:
   params: [{name: APP, type: string}]
   steps:
   - name: build
-    image: registry.redhat.io/openshift4/ose-cli:latest
+    image: quay.io/openshift/origin-cli:4.18
     script: |
-      oc start-build $(params.APP) --follow
+      # BUG: this references a non-existent BuildConfig name.
+      oc start-build $(params.APP)-broken --follow
 ---
 apiVersion: tekton.dev/v1
 kind: Task
@@ -16,9 +17,10 @@ spec:
   params: [{name: APP, type: string}]
   steps:
   - name: deploy
-    image: registry.redhat.io/openshift4/ose-cli:latest
+    image: quay.io/openshift/origin-cli:4.18
     script: |
-      oc rollout status deployment/$(params.APP) --timeout=180s
+      # BUG: this references a non-existent Deployment name.
+      oc rollout status deployment/$(params.APP)-broken --timeout=180s
 ---
 apiVersion: tekton.dev/v1
 kind: Pipeline
@@ -27,7 +29,8 @@ spec:
   params: [{name: APP, type: string}]
   tasks:
   - name: build
-    taskRef: {name: build-task}
+    # BUG: taskRef points to the wrong Task name.
+    taskRef: {name: build-task-wrong}
     params: [{name: APP, value: '$(params.APP)'}]
 ---
 apiVersion: tekton.dev/v1
