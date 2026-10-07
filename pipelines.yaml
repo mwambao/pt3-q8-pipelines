@@ -5,7 +5,7 @@ spec:
   params: [{name: APP, type: string}]
   steps:
   - name: build
-    image: quay.io/openshift/origin-cli:4.18
+    image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
     script: |
       # BUG: this references a non-existent BuildConfig name.
       oc start-build $(params.APP)-broken --follow
@@ -17,7 +17,7 @@ spec:
   params: [{name: APP, type: string}]
   steps:
   - name: deploy
-    image: quay.io/openshift/origin-cli:4.18
+    image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
     script: |
       # BUG: this references a non-existent Deployment name.
       oc rollout status deployment/$(params.APP)-broken --timeout=180s
